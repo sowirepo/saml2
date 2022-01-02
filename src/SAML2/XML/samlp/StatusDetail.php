@@ -31,6 +31,7 @@ final class StatusDetail extends AbstractSamlpElement
      */
     public function __construct(array $details = [])
     {
+        Assert::allIsInstanceOf($details, Chunk::class);
         $this->setElements($details);
     }
 
@@ -84,6 +85,7 @@ final class StatusDetail extends AbstractSamlpElement
         $e = $this->instantiateParentElement($parent);
 
         foreach ($this->elements as $detail) {
+            /** @psalm-var \SimpleSAML\XML\Chunk $detail */
             $e->appendChild($e->ownerDocument->importNode($detail->getXML(), true));
         }
 
