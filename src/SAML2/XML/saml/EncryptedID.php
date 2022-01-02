@@ -7,7 +7,10 @@ namespace SimpleSAML\SAML2\XML\saml;
 use InvalidArgumentException;
 use SimpleSAML\SAML2\Compat\ContainerSingleton;
 use SimpleSAML\SAML2\Constants;
-use SimpleSAML\XML\AbstractXMLElement;
+use SimpleSAML\XML\DOMDocumentFactory;
+use SimpleSAML\XML\XMLElementInterface;
+use SimpleSAML\XMLSecurity\Alg\Encryption\EncryptionAlgorithmInterface;
+use SimpleSAML\XMLSecurity\Backend\EncryptionBackend;
 use SimpleSAML\XMLSecurity\Utils\Security;
 use SimpleSAML\XMLSecurity\XML\EncryptedElementInterface;
 use SimpleSAML\XMLSecurity\XML\EncryptedElementTrait;
@@ -24,19 +27,37 @@ class EncryptedID extends AbstractSamlElement implements EncryptedElementInterfa
 {
     use EncryptedElementTrait;
 
+
+    /**
+     * @return \SimpleSAML\XMLSecurity\Backend\EncryptionBackend|null The encryption backend to use, or null if we want
+     * to use the default.
+     */
+    public function getEncryptionBackend(): ?EncryptionBackend
+    {
+//        return $this->backend;
+    }
+
+
+    /**
+     * @return string[]|null An array with all algorithm identifiers that we want to blacklist, or null if we want to
+     * use the defaults.
+     */
+    public function getBlacklistedAlgorithms(): ?array
+    {
+//        return $this->blacklistedAlgs;
+    }
+
+
     /**
      * @inheritDoc
      *
-     * @return \SimpleSAML\SAML2\XML\saml\IdentifierInterface
      * @throws \InvalidArgumentException
-     *
-     * @psalm-suppress MismatchingDocblockReturnType
-     * @psalm-suppress ImplementedReturnTypeMismatch
      */
-    public function decrypt(XMLSecurityKey $key, array $blacklist = []): AbstractXmlElement
+    public function decrypt(EncryptionAlgorithmInterface $decryptor): XMLElementInterface
     {
-        $xml = Security::decryptElement($this->encryptedData->toXML(), $key, $blacklist);
+        $xml = DOMDocumentFactory::fromString($this->decryptData($decryptor))->documentElement;
         $id = implode(':', [$xml->namespaceURI, $xml->localName]);
+
         switch ($id) {
             case NameID::NS . ':NameID':
                 return NameID::fromXML($xml);
@@ -53,6 +74,7 @@ class EncryptedID extends AbstractSamlElement implements EncryptedElementInterfa
             default:
                 // Fall thru
         }
+
         throw new InvalidArgumentException('Unknown or unsupported encrypted identifier.');
     }
 }
