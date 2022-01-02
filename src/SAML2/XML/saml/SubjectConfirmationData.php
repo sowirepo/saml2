@@ -305,7 +305,7 @@ final class SubjectConfirmationData extends AbstractSamlElement
         foreach ($xml->childNodes as $n) {
             if (!($n instanceof DOMElement)) {
                 continue;
-            } elseif ($n->namespaceURI === XMLSecurityDSig::XMLDSIGNS && $n->localName === 'KeyInfo') {
+            } elseif ($n->namespaceURI === KeyInfo::NS && $n->localName === 'KeyInfo') {
                 $info[] = KeyInfo::fromXML($n);
                 continue;
             } else {
