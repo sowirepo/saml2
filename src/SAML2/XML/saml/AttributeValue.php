@@ -24,7 +24,7 @@ class AttributeValue implements Serializable
      *
      * @var \DOMElement
      */
-    private $element;
+    protected $element;
 
 
     /**
@@ -181,11 +181,15 @@ class AttributeValue implements Serializable
      */
     public function __unserialize(array $serialized): void
     {
-        $xml = new self(
-            DOMDocumentFactory::fromString(array_pop($serialized))->documentElement
+        $xml = new static(
+            DOMDocumentFactory::fromString(current($serialized))->documentElement
         );
 
         $vars = get_object_vars($xml);
+// Good
+var_dump(DOMDocumentFactory::fromString(current($serialized))->saveXML());
+// Empty DOM-structure - Issue must be in the constructor or, more likely, in Utils::copyElement
+var_dump($xml->getElement()->ownerDocument->saveXML());
         foreach ($vars as $k => $v) {
             $this->$k = $v;
         }
