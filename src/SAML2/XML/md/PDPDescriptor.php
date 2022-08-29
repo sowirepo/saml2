@@ -17,7 +17,7 @@ use function preg_split;
  *
  * @package simplesamlphp/saml2
  */
-final class PDPDescriptor extends AbstractRoleDescriptor
+final class PDPDescriptor extends AbstractRoleDescriptorType
 {
     /**
      * List of AuthzService endpoints.

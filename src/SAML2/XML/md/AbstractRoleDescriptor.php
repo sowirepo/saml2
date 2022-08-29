@@ -6,61 +6,42 @@ namespace SimpleSAML\SAML2\XML\md;
 
 use DOMElement;
 use SimpleSAML\Assert\Assert;
+use SimpleSAML\SAML2\Compat\ContainerSingleton;
 use SimpleSAML\SAML2\Constants as C;
+use SimpleSAML\SAML2\Utils;
+use SimpleSAML\SAML2\XML\ExtensionPointInterface;
+use SimpleSAML\SAML2\XML\ExtensionPointTrait;
+use SimpleSAML\SAML2\XML\IDNameQualifiersTrait;
+use SimpleSAML\XML\Chunk;
+use SimpleSAML\XML\Exception\InvalidDOMElementException;
 use SimpleSAML\XML\Exception\SchemaViolationException;
+use SimpleSAML\XMLSecurity\Backend\EncryptionBackend;
+use SimpleSAML\XMLSecurity\XML\EncryptableElementInterface;
+use SimpleSAML\XMLSecurity\XML\EncryptableElementTrait;
 
-use function implode;
+use function count;
+use function explode;
 
 /**
- * Class representing SAML 2 RoleDescriptor element.
+ * SAML Metadata RoleDescriptor element.
  *
  * @package simplesamlphp/saml2
  */
-abstract class AbstractRoleDescriptor extends AbstractMetadataDocument
+abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType implements ExtensionPointInterface
 {
-    /**
-     * List of supported protocols.
-     *
-     * @var string[]
-     */
-    protected array $protocolSupportEnumeration = [];
+    use ExtensionPointTrait;
 
-    /**
-     * Error URL for this role.
-     *
-     * @var string|null
-     */
-    protected ?string $errorURL = null;
+    /** @var string */
+    public const LOCALNAME = 'RoleDescriptor';
 
-    /**
-     * KeyDescriptor elements.
-     *
-     * Array of \SimpleSAML\SAML2\XML\md\KeyDescriptor elements.
-     *
-     * @var \SimpleSAML\SAML2\XML\md\KeyDescriptor[]
-     */
-    protected array $KeyDescriptors = [];
-
-    /**
-     * Organization of this role.
-     *
-     * @var \SimpleSAML\SAML2\XML\md\Organization|null
-     */
-    protected ?Organization $Organization = null;
-
-    /**
-     * ContactPerson elements for this role.
-     *
-     * Array of \SimpleSAML\SAML2\XML\md\ContactPerson objects.
-     *
-     * @var \SimpleSAML\SAML2\XML\md\ContactPerson[]
-     */
-    protected array $ContactPersons = [];
+    /** @var string */
+    protected string $type;
 
 
     /**
-     * Initialize a RoleDescriptor.
+     * Initialize a saml:RoleDescriptor from scratch
      *
+     * @param string $type
      * @param string[] $protocolSupportEnumeration A set of URI specifying the protocols supported.
      * @param string|null $ID The ID for this document. Defaults to null.
      * @param int|null $validUntil Unix time of validity for this document. Defaults to null.
@@ -72,7 +53,8 @@ abstract class AbstractRoleDescriptor extends AbstractMetadataDocument
      * @param \SimpleSAML\SAML2\XML\md\ContactPerson[] $contacts An array of contacts for this entity. Defaults to an empty array.
      * @param \DOMAttr[] $namespacedAttributes
      */
-    public function __construct(
+    protected function __construct(
+        string $type,
         array $protocolSupportEnumeration,
         ?string $ID = null,
         ?int $validUntil = null,
@@ -84,177 +66,113 @@ abstract class AbstractRoleDescriptor extends AbstractMetadataDocument
         array $contacts = [],
         array $namespacedAttributes = []
     ) {
-        parent::__construct($ID, $validUntil, $cacheDuration, $extensions, $namespacedAttributes);
+        parent::__construct(
+            $protocolSupportEnumeration,
+            $ID,
+            $validUntil,
+            $cacheDuration,
+            $extensions,
+            $errorURL,
+            $keyDescriptors,
+            $organization,
+            $contacts
+        );
 
-        $this->setProtocolSupportEnumeration($protocolSupportEnumeration);
-        $this->setErrorURL($errorURL);
-        $this->setKeyDescriptors($keyDescriptors);
-        $this->setOrganization($organization);
-        $this->setContactPersons($contacts);
+        $this->type = $type;
     }
 
 
     /**
-     * Collect the value of the errorURL property.
-     *
-     * @return string|null
+     * @inheritDoc
      */
-    public function getErrorURL()
+    public function getXsiType(): string
     {
-        return $this->errorURL;
+        return $this->type;
     }
 
 
     /**
-     * Set the value of the errorURL property.
+     * Convert XML into an RoleDescriptor
      *
-     * @param string|null $errorURL
-     * @throws \SimpleSAML\SAML2\Exception\SchemaViolationException
-     */
-    protected function setErrorURL(?string $errorURL = null): void
-    {
-        Assert::nullOrValidURI($errorURL, SchemaViolationException::class); // Covers the empty string
-        $this->errorURL = $errorURL;
-    }
-
-
-    /**
-     * Collect the value of the protocolSupportEnumeration property.
+     * @param \DOMElement $xml The XML element we should load
+     * @return \SimpleSAML\SAML2\XML\saml\AbstractRoleDescriptor
      *
-     * @return string[]
+     * @throws \SimpleSAML\XML\Exception\InvalidDOMElementException if the qualified name of the supplied element is wrong
      */
-    public function getProtocolSupportEnumeration()
+    public static function fromXML(DOMElement $xml): object
     {
-        return $this->protocolSupportEnumeration;
-    }
+        Assert::same($xml->localName, 'RoleDescriptor', InvalidDOMElementException::class);
+        Assert::same($xml->namespaceURI, C::NS_MD, InvalidDOMElementException::class);
+        Assert::true(
+            $xml->hasAttributeNS(C::NS_XSI, 'type'),
+            'Missing required xsi:type in <saml:RoleDescriptor> element.',
+            SchemaViolationException::class
+        );
 
+        $type = $xml->getAttributeNS(C::NS_XSI, 'type');
+        Assert::validQName($type, SchemaViolationException::class);
 
-    /**
-     * Set the value of the ProtocolSupportEnumeration property.
-     *
-     * @param string[] $protocols
-     * @throws \SimpleSAML\Assert\AssertionFailedException
-     * @throws \SimpleSAML\XML\Exception\SchemaViolationException
-     */
-    protected function setProtocolSupportEnumeration(array $protocols): void
-    {
-        Assert::minCount($protocols, 1, 'At least one protocol must be supported by this ' . static::class . '.');
-        // @TODO: create allValidURI in assert-library
-        foreach ($protocols as $protocol) {
-            Assert::validURI($protocol, SchemaViolationException::class);
+        // first, try to resolve the type to a full namespaced version
+        $qname = explode(':', $type, 2);
+        if (count($qname) === 2) {
+            list($prefix, $element) = $qname;
+        } else {
+            $prefix = null;
+            list($element) = $qname;
         }
-        Assert::oneOf(C::NS_SAMLP, $protocols, 'At least SAML 2.0 must be one of supported protocols.');
+        $ns = $xml->lookupNamespaceUri($prefix);
+        $type = ($ns === null ) ? $element : implode(':', [$ns, $element]);
 
-        $this->protocolSupportEnumeration = $protocols;
-    }
+        // now check if we have a handler registered for it
+        $handler = Utils::getContainer()->getExtensionHandler($type);
+        if ($handler === null) {
+            // we don't have a handler, proceed with unknown identifier
+            $protocols = self::getAttribute($xml, 'protocolSupportEnumeration');
 
+            $validUntil = self::getAttribute($xml, 'validUntil', null);
+            $orgs = Organization::getChildrenOfClass($xml);
+            Assert::maxCount($orgs, 1, 'More than one Organization found in this descriptor', TooManyElementsException::class);
 
-    /**
-     * Collect the value of the Organization property.
-     *
-     * @return \SimpleSAML\SAML2\XML\md\Organization|null
-     */
-    public function getOrganization()
-    {
-        return $this->Organization;
-    }
+            $extensions = Extensions::getChildrenOfClass($xml);
+            Assert::maxCount($extensions, 1, 'Only one md:Extensions element is allowed.', TooManyElementsException::class);
 
+            return new UnknownRoleDescriptor(
+                new Chunk($xml),
+                $type,
+                preg_split('/[\s]+/', trim($protocols)),
+                self::getAttribute($xml, 'ID', null),
+                $validUntil !== null ? XMLUtils::xsDateTimeToTimestamp($validUntil) : null,
+                self::getAttribute($xml, 'cacheDuration', null),
+                !empty($extensions) ? $extensions[0] : null,
+                self::getAttribute($xml, 'errorURL', null),
+                KeyDescriptor::getChildrenOfClass($xml),
+                !empty($orgs) ? $orgs[0] : null,
+                ContactPerson::getChildrenOfClass($xml),
+            );
+        }
 
-    /**
-     * Set the value of the Organization property.
-     *
-     * @param \SimpleSAML\SAML2\XML\md\Organization|null $organization
-     */
-    protected function setOrganization(?Organization $organization = null): void
-    {
-        $this->Organization = $organization;
-    }
-
-
-    /**
-     * Collect the value of the ContactPersons property.
-     *
-     * @return \SimpleSAML\SAML2\XML\md\ContactPerson[]
-     */
-    public function getContactPersons()
-    {
-        return $this->ContactPersons;
-    }
-
-
-    /**
-     * Set the value of the ContactPerson property.
-     *
-     * @param \SimpleSAML\SAML2\XML\md\ContactPerson[] $contactPersons
-     * @throws \SimpleSAML\Assert\AssertionFailedException
-     */
-    protected function setContactPersons(array $contactPersons): void
-    {
-        Assert::allIsInstanceOf(
-            $contactPersons,
-            ContactPerson::class,
-            'All contacts must be an instance of md:ContactPerson',
+        Assert::subclassOf(
+            $handler,
+            AbstractRoleDescriptor::class,
+            'Elements implementing RoleDescriptor must extend \SimpleSAML\SAML2\XML\saml\AbstractRoleDescriptor.',
         );
 
-        $this->ContactPersons = $contactPersons;
+        return $handler::fromXML($xml);
     }
 
 
     /**
-     * Collect the value of the KeyDescriptors property.
+     * Convert this RoleDescriptor to XML.
      *
-     * @return \SimpleSAML\SAML2\XML\md\KeyDescriptor[]
+     * @param \DOMElement $parent The element we are converting to XML.
+     * @return \DOMElement The XML element after adding the data corresponding to this RoleDescriptor.
      */
-    public function getKeyDescriptors()
-    {
-        return $this->KeyDescriptors;
-    }
-
-
-    /**
-     * Set the value of the KeyDescriptor property.
-     *
-     * @param \SimpleSAML\SAML2\XML\md\KeyDescriptor[] $keyDescriptor
-     */
-    protected function setKeyDescriptors(array $keyDescriptor): void
-    {
-        Assert::allIsInstanceOf(
-            $keyDescriptor,
-            KeyDescriptor::class,
-            'All key descriptors must be an instance of md:KeyDescriptor',
-        );
-
-        $this->KeyDescriptors = $keyDescriptor;
-    }
-
-
-    /**
-     * Add this RoleDescriptor to an EntityDescriptor.
-     *
-     * @param \DOMElement $parent The EntityDescriptor we should append this endpoint to.
-     * @return \DOMElement
-     */
-    public function toXML(?DOMElement $parent = null): DOMElement
+    public function toXML(DOMElement $parent = null): DOMElement
     {
         $e = parent::toXML($parent);
 
-        $e->setAttribute('protocolSupportEnumeration', implode(' ', $this->protocolSupportEnumeration));
-
-        if ($this->errorURL !== null) {
-            $e->setAttribute('errorURL', $this->errorURL);
-        }
-
-        foreach ($this->KeyDescriptors as $kd) {
-            $kd->toXML($e);
-        }
-
-        if ($this->Organization !== null) {
-            $this->Organization->toXML($e);
-        }
-
-        foreach ($this->ContactPersons as $cp) {
-            $cp->toXML($e);
-        }
+        $e->setAttribute('xmlns:' . static::getXsiTypePrefix(), static::getXsiTypeNamespaceURI());
+        $e->setAttributeNS(C::NS_XSI, 'xsi:type', $this->getXsiType());
 
         return $e;
     }

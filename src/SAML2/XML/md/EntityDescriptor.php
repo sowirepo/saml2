@@ -35,7 +35,7 @@ final class EntityDescriptor extends AbstractMetadataDocument
      *
      * Array of \SimpleSAML\SAML2\XML\md\RoleDescriptor objects (and subclasses of RoleDescriptor).
      *
-     * @var \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptor[]
+     * @var \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptorType[]
      */
     protected array $RoleDescriptor = [];
 
@@ -76,7 +76,7 @@ final class EntityDescriptor extends AbstractMetadataDocument
      * @param int|null $validUntil Unix time of validify for this document. Defaults to null.
      * @param string|null $cacheDuration Maximum time this document can be cached. Defaults to null.
      * @param \SimpleSAML\SAML2\XML\md\Extensions|null $extensions An array of extensions.
-     * @param \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptor[] $roleDescriptors An array of role descriptors.
+     * @param \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptorType[] $roleDescriptors An array of role descriptors.
      * @param \SimpleSAML\SAML2\XML\md\AffiliationDescriptor|null $affiliationDescriptor An affiliation descriptor to
      *   use instead of role descriptors.
      * @param \SimpleSAML\SAML2\XML\md\Organization|null $organization The organization responsible for the SAML entity.
@@ -260,7 +260,7 @@ final class EntityDescriptor extends AbstractMetadataDocument
     /**
      * Collect the value of the RoleDescriptor property.
      *
-     * @return \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptor[]
+     * @return \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptorType[]
      */
     public function getRoleDescriptors(): array
     {
@@ -271,15 +271,15 @@ final class EntityDescriptor extends AbstractMetadataDocument
     /**
      * Set the value of the RoleDescriptor property.
      *
-     * @param \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptor[] $roleDescriptors
+     * @param \SimpleSAML\SAML2\XML\md\AbstractRoleDescriptorType[] $roleDescriptors
      * @throws \SimpleSAML\Assert\AssertionFailedException
      */
     protected function setRoleDescriptors(array $roleDescriptors): void
     {
         Assert::allIsInstanceOf(
             $roleDescriptors,
-            AbstractRoleDescriptor::class,
-            'All role descriptors must extend AbstractRoleDescriptor.'
+            AbstractRoleDescriptorType::class,
+            'All role descriptors must extend AbstractRoleDescriptorType.'
         );
         $this->RoleDescriptor = $roleDescriptors;
     }

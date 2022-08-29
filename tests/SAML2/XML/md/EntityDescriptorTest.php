@@ -350,7 +350,7 @@ XML
     public function testUnmarshalling(): void
     {
         $pdpd = $this->xmlRepresentation->getElementsByTagNameNS(C::NS_MD, 'PDPDescriptor')->item(0);
-        $customd = $this->xmlRepresentation->createElementNS(C::NS_MD, 'md:CustomRoleDescriptor');
+        $customd = $this->xmlRepresentation->createElementNS(C::NS_MD, 'md:RoleDescriptor');
         $customd->setAttribute('protocolSupportEnumeration', 'urn:oasis:names:tc:SAML:2.0:protocol');
         $newline = new DOMText("\n  ");
         /**
@@ -385,7 +385,7 @@ XML
         $this->assertInstanceOf(UnknownRoleDescriptor::class, $roleDescriptors[4]);
 
         $chunk = $roleDescriptors[4]->getXML();
-        $this->assertEquals('CustomRoleDescriptor', $chunk->getLocalName());
+        $this->assertEquals('RoleDescriptor', $chunk->getLocalName());
 
         $this->assertInstanceOf(Organization::class, $entityDescriptor->getOrganization());
 
