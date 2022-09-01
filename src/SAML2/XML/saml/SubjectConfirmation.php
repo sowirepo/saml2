@@ -20,7 +20,7 @@ use function array_pop;
  *
  * @package simplesamlphp/saml2
  */
-final class SubjectConfirmation extends AbstractSamlElement
+class SubjectConfirmation extends AbstractSamlElement
 {
     use IdentifierTrait;
 
