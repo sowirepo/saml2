@@ -24,10 +24,6 @@ final class RelayState extends AbstractEcpElement
 {
     use XMLStringElementTrait;
 
-    /** @var boolean $mustUnderstand */
-    protected bool $mustUnderstand;
-
-
     /**
      * Create a ECP RelayState element.
      *
@@ -37,7 +33,6 @@ final class RelayState extends AbstractEcpElement
     public function __construct(string $content, bool $mustUnderstand)
     {
         $this->setContent($content);
-        $this->mustUnderstand = $mustUnderstand;
     }
 
 
@@ -70,9 +65,9 @@ final class RelayState extends AbstractEcpElement
         $mustUnderstand = $xml->getAttributeNS(C::NS_SOAP, 'mustUnderstand');
         $actor = $xml->getAttributeNS(C::NS_SOAP, 'actor');
 
-        Assert::oneOf(
+        Assert::same(
             $mustUnderstand,
-            ['', '0', '1'],
+            '1',
             'Invalid value of SOAP-ENV:mustUnderstand attribute in <ecp:Response>.',
             ProtocolViolationException::class,
         );
@@ -98,7 +93,7 @@ final class RelayState extends AbstractEcpElement
         $response = $this->instantiateParentElement($parent);
         $response->textContent = $this->getContent();
 
-        $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:mustUnderstand', $this->mustUnderstand ? '1' : '0');
+        $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:mustUnderstand', '1');
         $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:actor', 'http://schemas.xmlsoap.org/soap/actor/next');
 
         return $response;
