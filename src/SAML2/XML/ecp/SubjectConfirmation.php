@@ -63,6 +63,11 @@ final class SubjectConfirmation extends \SimpleSAML\SAML2\XML\saml\SubjectConfir
             'Missing SOAP-ENV:actor attribute in <ecp:SubjectConfirmation>.',
             MissingAttributeException::class
         );
+        Assert::true(
+            $xml->hasAttributeNS(C::NS_SOAP, 'mustUnderstand'),
+            'Missing SOAP-ENV:mustUnderstalnd attribute in <ecp:SubjectConfirmation>.',
+            MissingAttributeException::class
+        );
 
         $mustUnderstand = $xml->getAttributeNS(C::NS_SOAP, 'mustUnderstand');
         $actor = $xml->getAttributeNS(C::NS_SOAP, 'actor');

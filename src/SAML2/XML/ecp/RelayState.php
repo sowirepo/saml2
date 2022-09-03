@@ -12,9 +12,7 @@ use SimpleSAML\XML\Exception\InvalidDOMElementException;
 use SimpleSAML\XML\Exception\MissingAttributeException;
 use SimpleSAML\XML\XMLStringElementTrait;
 
-use function intval;
-use function is_null;
-use function is_numeric;
+use function boolval;
 use function strval;
 
 /**
@@ -26,17 +24,17 @@ final class RelayState extends AbstractEcpElement
 {
     use XMLStringElementTrait;
 
-    /** @var int|null $mustUnderstand */
-    protected $mustUnderstand = null;
+    /** @var boolean $mustUnderstand */
+    protected bool $mustUnderstand;
 
 
     /**
      * Create a ECP RelayState element.
      *
      * @param string $content
-     * @param int|null $mustUnderstand
+     * @param boolean $mustUnderstand
      */
-    public function __construct(string $content, ?int $mustUnderstand = null)
+    public function __construct(string $content, bool $mustUnderstand)
     {
         $this->setContent($content);
         $this->mustUnderstand = $mustUnderstand;
@@ -85,9 +83,7 @@ final class RelayState extends AbstractEcpElement
             ProtocolViolationException::class,
         );
 
-        $mustUnderstand = is_numeric($mustUnderstand) ? intval($mustUnderstand) : null;
-
-        return new self($xml->textContent, $mustUnderstand);
+        return new self($xml->textContent, boolval($mustUnderstand));
     }
 
 
@@ -102,9 +98,7 @@ final class RelayState extends AbstractEcpElement
         $response = $this->instantiateParentElement($parent);
         $response->textContent = $this->getContent();
 
-        if (!is_null($this->mustUnderstand)) {
-            $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:mustUnderstand', strval($this->mustUnderstand));
-        }
+        $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:mustUnderstand', $this->mustUnderstand ? '1' : '0');
         $response->setAttributeNS(C::NS_SOAP, 'SOAP-ENV:actor', 'http://schemas.xmlsoap.org/soap/actor/next');
 
         return $response;
