@@ -14,6 +14,7 @@ use SimpleSAML\SAML2\XML\samlp\ArtifactResponse;
 use SimpleSAML\SAML2\XML\samlp\NameIDPolicy;
 use SimpleSAML\SAML2\XML\samlp\Status;
 use SimpleSAML\SAML2\XML\samlp\StatusCode;
+use SimpleSAML\Test\XML\SchemaValidationTestTrait;
 use SimpleSAML\Test\XML\SerializableElementTestTrait;
 use SimpleSAML\XML\DOMDocumentFactory;
 use SimpleSAML\XML\Utils as XMLUtils;
@@ -30,6 +31,7 @@ use function strval;
  */
 final class ArtifactResponseTest extends TestCase
 {
+    use SchemaValidationTestTrait;
     use SerializableElementTestTrait;
 
 
@@ -37,6 +39,8 @@ final class ArtifactResponseTest extends TestCase
      */
     public function setUp(): void
     {
+        $this->schema = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/schemas/saml-schema-protocol-2.0.xsd';
+
         $this->testedClass = ArtifactResponse::class;
 
         $this->xmlRepresentation = DOMDocumentFactory::fromFile(

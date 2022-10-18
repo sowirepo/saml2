@@ -11,6 +11,7 @@ use SimpleSAML\SAML2\XML\samlp\Response;
 use SimpleSAML\SAML2\XML\samlp\Status;
 use SimpleSAML\SAML2\XML\samlp\StatusCode;
 use SimpleSAML\SAML2\XML\saml\Issuer;
+use SimpleSAML\Test\XML\SchemaValidationTestTrait;
 use SimpleSAML\Test\XML\SerializableElementTestTrait;
 use SimpleSAML\XML\DOMDocumentFactory;
 
@@ -28,6 +29,23 @@ use function strval;
  */
 final class ResponseTest extends TestCase
 {
+    use SchemaValidationTestTrait;
+    use SerializableElementTestTrait;
+
+    /**
+     */
+    public function setUp(): void
+    {
+        $this->schema = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/schemas/saml-schema-protocol-2.0.xsd';
+
+        $this->testedClass = Response::class;
+
+        $this->xmlRepresentation = DOMDocumentFactory::fromFile(
+            dirname(dirname(dirname(dirname(__FILE__)))) . '/resources/xml/samlp_Response.xml'
+        );
+    }
+
+
     /**
      */
     public function testMarshalling(): void

@@ -28,6 +28,7 @@ use SimpleSAML\SAML2\XML\samlp\NameIDPolicy;
 use SimpleSAML\SAML2\XML\samlp\RequestedAuthnContext;
 use SimpleSAML\SAML2\XML\samlp\RequesterID;
 use SimpleSAML\SAML2\XML\samlp\Scoping;
+use SimpleSAML\Test\XML\SchemaValidationTestTrait;
 use SimpleSAML\Test\XML\SerializableElementTestTrait;
 use SimpleSAML\XML\DOMDocumentFactory;
 use SimpleSAML\XML\Exception\MissingAttributeException;
@@ -53,6 +54,7 @@ use function strval;
  */
 final class AuthnRequestTest extends TestCase
 {
+    use SchemaValidationTestTrait;
     use SerializableElementTestTrait;
 
 
@@ -60,6 +62,8 @@ final class AuthnRequestTest extends TestCase
      */
     public function setUp(): void
     {
+        $this->schema = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/schemas/saml-schema-protocol-2.0.xsd';
+
         $this->testedClass = AuthnRequest::class;
 
         $this->xmlRepresentation = DOMDocumentFactory::fromFile(

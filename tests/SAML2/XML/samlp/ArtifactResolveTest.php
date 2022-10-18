@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use SimpleSAML\SAML2\Utils;
 use SimpleSAML\SAML2\XML\saml\Issuer;
 use SimpleSAML\SAML2\XML\samlp\ArtifactResolve;
+use SimpleSAML\Test\XML\SchemaValidationTestTrait;
 use SimpleSAML\Test\XML\SerializableElementTestTrait;
 use SimpleSAML\XML\DOMDocumentFactory;
 
@@ -24,6 +25,7 @@ use function strval;
  */
 final class ArtifactResolveTest extends TestCase
 {
+    use SchemaValidationTestTrait;
     use SerializableElementTestTrait;
 
 
@@ -31,6 +33,8 @@ final class ArtifactResolveTest extends TestCase
      */
     public function setup(): void
     {
+        $this->schema = dirname(dirname(dirname(dirname(dirname(__FILE__))))) . '/schemas/saml-schema-protocol-2.0.xsd';
+
         $this->testedClass = ArtifactResolve::class;
 
         $this->xmlRepresentation = DOMDocumentFactory::fromFile(
