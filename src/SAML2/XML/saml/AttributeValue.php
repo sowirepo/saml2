@@ -24,7 +24,7 @@ class AttributeValue implements Serializable
      *
      * @var \DOMElement
      */
-    private $element;
+    protected DOMElement $element;
 
 
     /**
@@ -54,7 +54,6 @@ class AttributeValue implements Serializable
         $doc = DOMDocumentFactory::create();
         if ($value->namespaceURI === Constants::NS_SAML && $value->localName === 'AttributeValue') {
             $doc->appendChild($doc->importNode($value, true));
-            $this->element = $doc->documentElement;
             $this->element = $doc->documentElement;
             return;
         }
@@ -184,7 +183,7 @@ class AttributeValue implements Serializable
     {
         $element = DOMDocumentFactory::fromString(array_pop($serialized))->documentElement;
         $xml = new self($element);
-        $this->setelement($element);
+        $this->setElement($element);
 
         $vars = get_object_vars($xml);
         foreach ($vars as $k => $v) {
