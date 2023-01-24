@@ -144,7 +144,6 @@ abstract class AbstractRoleDescriptorType extends AbstractMetadataDocument
             'At least one protocol must be supported by this ' . static::NS_PREFIX . ':' . static::getLocalName() . '.',
         );
         Assert::allValidURI($protocols, SchemaViolationException::class);
-        Assert::oneOf(C::NS_SAMLP, $protocols, 'At least SAML 2.0 must be one of supported protocols.');
 
         $this->protocolSupportEnumeration = $protocols;
     }
