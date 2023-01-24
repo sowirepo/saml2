@@ -132,7 +132,7 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
         // now check if we have a handler registered for it
         $handler = Utils::getContainer()->getExtensionHandler($type);
         if ($handler === null) {
-            // we don't have a handler, proceed with unknown identifier
+            // we don't have a handler, proceed with unknown RoleDescriptor
             $protocols = self::getAttribute($xml, 'protocolSupportEnumeration');
 
             $validUntil = self::getAttribute($xml, 'validUntil', null);
