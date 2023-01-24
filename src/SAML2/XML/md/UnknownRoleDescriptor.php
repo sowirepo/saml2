@@ -94,6 +94,6 @@ final class UnknownRoleDescriptor extends AbstractRoleDescriptor
      */
     public function toXML(DOMElement $parent = null): DOMElement
     {
-        return $this->chunk->toXML($parent);
+        return $this->getRawRoleDescriptor()->toXML($parent);
     }
 }
