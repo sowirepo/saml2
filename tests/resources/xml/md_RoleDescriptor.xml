@@ -29,5 +29,5 @@
   <md:ContactPerson contactType="technical">
     <md:TelephoneNumber>1-234-567-8901</md:TelephoneNumber>
   </md:ContactPerson>
-  <ssp:Chunk>Other</ssp:Chunk>
+  <saml:Audience xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">urn:some:audience</saml:Audience>
 </md:RoleDescriptor>

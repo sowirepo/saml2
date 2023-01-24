@@ -264,13 +264,12 @@ final class ContactPerson extends AbstractMdElement
         $attributes = [];
         foreach ($data as $ns => $attribute) {
             $name = array_key_first($attribute);
-            $value = $attribute[$name];
 
-            $doc = DOMDocumentFactory::create();
-            $elt = $doc->createElement("placeholder");
-            $elt->setAttributeNS($ns, $name, $value);
+            $doc = DOMDocumentFactory::fromString('<root/>');
+            $attr = $doc->createAttributeNS($ns, $name);
+            $attr->value = $attribute[$name];
 
-            $attributes[] = $elt->getAttributeNode($name);
+            $attributes[] = $attr;
         }
 
         return new static(
