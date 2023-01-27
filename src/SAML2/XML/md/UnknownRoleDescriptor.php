@@ -24,9 +24,6 @@ use function preg_split;
  */
 final class UnknownRoleDescriptor extends AbstractRoleDescriptor
 {
-    /** @var \SimpleSAML\XML\Chunk */
-    protected Chunk $chunk;
-
     /**
      * Initialize a saml:RoleDescriptor from scratch.
      *
@@ -44,7 +41,7 @@ final class UnknownRoleDescriptor extends AbstractRoleDescriptor
      * @param \DOMAttr[] $namespacedAttributes
      */
     protected function __construct(
-        Chunk $chunk,
+        protected Chunk $chunk,
         string $type,
         array $protocolSupportEnumeration,
         ?string $ID = null,
@@ -70,8 +67,6 @@ final class UnknownRoleDescriptor extends AbstractRoleDescriptor
             $contacts,
             $namespacedAttributes
         );
-
-        $this->chunk = $chunk;
     }
 
 

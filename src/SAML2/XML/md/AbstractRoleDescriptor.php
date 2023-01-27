@@ -36,9 +36,6 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
     /** @var string */
     public const LOCALNAME = 'RoleDescriptor';
 
-    /** @var string */
-    protected string $type;
-
 
     /**
      * Initialize a saml:RoleDescriptor from scratch
@@ -59,7 +56,7 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
      * @param \DOMAttr[] $namespacedAttributes
      */
     protected function __construct(
-        string $type,
+        protected string $type,
         array $protocolSupportEnumeration,
         ?string $ID = null,
         ?int $validUntil = null,
@@ -83,8 +80,6 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
             $contactPerson,
             $namespacedAttributes
         );
-
-        $this->type = $type;
     }
 
 
@@ -177,11 +172,12 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
     {
         $e = parent::toUnsignedXML($parent);
 
-        $xsiType = $e->ownerDocument->createAttributeNS(C::NS_XSI, 'xsi:type');
-        $xsiType->value = $this->getXsiType();
+//        $xsiType = $e->ownerDocument->createAttributeNS(C::NS_XSI, 'xsi:type');
+//        $xsiType->value = $this->getXsiType();
 
-        $e->setAttributeNodeNS($xsiType);
+//        $e->setAttributeNodeNS($xsiType);
         $e->setAttribute('xmlns:' . static::getXsiTypePrefix(), static::getXsiTypeNamespaceURI());
+        $e->setAttributeNS(C::NS_XSI, 'xsi:type', $this->getXsiType());
 
         return $e;
     }

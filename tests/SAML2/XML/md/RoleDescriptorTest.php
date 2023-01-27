@@ -66,7 +66,7 @@ final class RoleDescriptorTest extends TestCase
         $this->testedClass = AbstractRoleDescriptor::class;
 
         $this->xmlRepresentation = DOMDocumentFactory::fromFile(
-            dirname(dirname(dirname(dirname(__FILE__)))) . '/resources/xml/md_RoleDescriptor.xml'
+            dirname(dirname(dirname(dirname(__FILE__)))) . '/resources/xml/md_RoleDescriptor.xml',
         );
 
         $container = new MockContainer();
@@ -116,23 +116,28 @@ final class RoleDescriptorTest extends TestCase
             ),
             [
                 new ContactPerson(
-                    'other',
-                    new Company('Test Company'),
-                    new GivenName('John'),
-                    new SurName('Doe'),
-                    null,
-                    [new EmailAddress('mailto:jdoe@test.company'), new EmailAddress('mailto:john.doe@test.company')],
-                    [new TelephoneNumber('1-234-567-8901')],
-                    [$attr_cp_1, $attr_cp_2],
+                    contactType: 'other',
+                    company: new Company('Test Company'),
+                    givenName: new GivenName('John'),
+                    surName SurName('Doe'),
+                    emailAddress: [
+                        new EmailAddress('mailto:jdoe@test.company'),
+                        new EmailAddress('mailto:john.doe@test.company'),
+                    ],
+                    telephoneNumber: [new TelephoneNumber('1-234-567-8901')],
+                    namespacedAttrinutes: [$attr_cp_1, $attr_cp_2],
                 ),
-                new ContactPerson('technical', null, null, null, null, [], [new TelephoneNumber('1-234-567-8901')]),
+                new ContactPerson(
+                    contactType: 'technical',
+                    telephoneNumber: [new TelephoneNumber('1-234-567-8901')],
+                ),
             ],
             [$attr_3],
         );
 
         $this->assertEquals(
             $this->xmlRepresentation->saveXML($this->xmlRepresentation->documentElement),
-            strval($roleDescriptor)
+            strval($roleDescriptor),
         );
     }
 
@@ -149,7 +154,7 @@ final class RoleDescriptorTest extends TestCase
         $this->assertInstanceOf(KeyDescriptor::class, $descriptor->getKeyDescriptors()[1]);
         $this->assertEquals(
             [C::NS_SAMLP, C::PROTOCOL],
-            $descriptor->getProtocolSupportEnumeration()
+            $descriptor->getProtocolSupportEnumeration(),
         );
         $this->assertInstanceOf(Organization::class, $descriptor->getOrganization());
         $this->assertCount(2, $descriptor->getContactPersons());
@@ -176,7 +181,7 @@ final class RoleDescriptorTest extends TestCase
 
         $this->assertEquals(
             $this->xmlRepresentation->saveXML($this->xmlRepresentation->documentElement),
-            strval($descriptor)
+            strval($descriptor),
         );
     }
 
@@ -198,7 +203,7 @@ final class RoleDescriptorTest extends TestCase
         $this->assertInstanceOf(KeyDescriptor::class, $descriptor->getKeyDescriptors()[1]);
         $this->assertEquals(
             [C::NS_SAMLP, C::PROTOCOL],
-            $descriptor->getProtocolSupportEnumeration()
+            $descriptor->getProtocolSupportEnumeration(),
         );
         $this->assertInstanceOf(Organization::class, $descriptor->getOrganization());
         $this->assertCount(2, $descriptor->getContactPersons());
@@ -236,7 +241,7 @@ final class RoleDescriptorTest extends TestCase
 
         $this->expectException(MissingAttributeException::class);
         $this->expectExceptionMessage(
-            'Missing \'protocolSupportEnumeration\' attribute on md:RoleDescriptor.'
+            'Missing \'protocolSupportEnumeration\' attribute on md:RoleDescriptor.',
         );
 
         UnknownRoleDescriptor::fromXML($this->xmlRepresentation->documentElement);
