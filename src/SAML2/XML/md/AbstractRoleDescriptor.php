@@ -78,9 +78,9 @@ abstract class AbstractRoleDescriptor extends AbstractRoleDescriptorType impleme
             $cacheDuration,
             $extensions,
             $errorURL,
-            $keyDescriptors,
+            $keyDescriptor,
             $organization,
-            $contacts,
+            $contactPerson,
             $namespacedAttributes
         );
 

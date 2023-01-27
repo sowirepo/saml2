@@ -69,7 +69,7 @@ final class EntityDescriptor extends AbstractMetadataDocument
         );
         Assert::allIsInstanceOf(
             $roleDescriptor,
-            AbstractRoleDescriptor::class,
+            AbstractRoleDescriptorType::class,
             'All role descriptors must extend AbstractRoleDescriptor.',
         );
         Assert::allIsInstanceOf(

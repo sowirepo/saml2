@@ -181,8 +181,8 @@ final class AttributeAuthorityDescriptorTest extends TestCase
         $this->assertEmpty($aad->getExtensions());
         $this->assertEmpty($aad->getErrorURL());
         $this->assertEmpty($aad->getOrganization());
-        $this->assertEmpty($aad->getKeyDescriptor());
-        $this->assertEmpty($aad->getContactPerson());
+        $this->assertEmpty($aad->getKeyDescriptors());
+        $this->assertEmpty($aad->getContactPersons());
     }
 
 
@@ -200,8 +200,8 @@ final class AttributeAuthorityDescriptorTest extends TestCase
         $this->assertEmpty($aad->getExtensions());
         $this->assertEmpty($aad->getErrorURL());
         $this->assertEmpty($aad->getOrganization());
-        $this->assertEmpty($aad->getKeyDescriptor());
-        $this->assertEmpty($aad->getContactPerson());
+        $this->assertEmpty($aad->getKeyDescriptors());
+        $this->assertEmpty($aad->getContactPersons());
     }
 
 
@@ -308,8 +308,8 @@ XML
         $this->assertEmpty($aad->getExtensions());
         $this->assertEmpty($aad->getErrorURL());
         $this->assertEmpty($aad->getOrganization());
-        $this->assertEmpty($aad->getKeyDescriptor());
-        $this->assertEmpty($aad->getContactPerson());
+        $this->assertEmpty($aad->getKeyDescriptors());
+        $this->assertEmpty($aad->getContactPersons());
     }
 
 
