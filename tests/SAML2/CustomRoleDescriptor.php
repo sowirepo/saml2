@@ -34,9 +34,6 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
     /** @var string */
     protected const XSI_TYPE_PREFIX = 'ssp';
 
-    /** @var \SimpleSAML\SAML2\XML\saml\Audience[] $audience */
-    protected array $audience = [];
-
 
     /**
      * CustomRoleDescriptor constructor.
@@ -54,7 +51,7 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
      * @param \DOMAttr[] $namespacedAttributes
      */
     public function __construct(
-        array $audience,
+        protected array $audience,
         array $protocolSupportEnumeration,
         ?string $ID = null,
         ?int $validUntil = null,
@@ -66,6 +63,8 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
         array $contacts = [],
         array $namespacedAttributes = []
     ) {
+        Assert::allIsInstanceOf($audience, Audience::class);
+
         parent::__construct(
             self::XSI_TYPE_PREFIX . ':' . self::XSI_TYPE_NAME,
             $protocolSupportEnumeration,
@@ -79,8 +78,6 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
             $contacts,
             $namespacedAttributes,
         );
-
-        $this->setAudience($audience);
     }
 
 
@@ -96,24 +93,10 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
 
 
     /**
-     * Set the value of the audience-attribute
-     *
-     * @param \SimpleSAML\SAML2\XML\saml\Audience[] $audience
-     */
-    protected function setAudience(array $audience): void
-    {
-        Assert::notEmpty($audience);
-        Assert::allIsInstanceOf($audience, Audience::class);
-
-        $this->audience = $audience;
-    }
-
-
-    /**
      * Convert XML into a RoleDescriptor
      *
      * @param \DOMElement $xml The XML element we should load
-     * @return \SimpleSAML\SAML2\XML\saml\AbstractRoleDescriptor
+     * @return static
      *
      * @throws \SimpleSAML\XML\Exception\InvalidDOMElementException if the qualified name of the supplied element is wrong
      */
@@ -168,7 +151,7 @@ final class CustomRoleDescriptor extends AbstractRoleDescriptor
     {
         $e = parent::toUnsignedXML($parent);
 
-        foreach ($this->audience as $audience) {
+        foreach ($this->getAudience() as $audience) {
             $audience->toXML($e);
         }
 

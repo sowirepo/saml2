@@ -119,13 +119,13 @@ final class RoleDescriptorTest extends TestCase
                     contactType: 'other',
                     company: new Company('Test Company'),
                     givenName: new GivenName('John'),
-                    surName SurName('Doe'),
+                    surName: new SurName('Doe'),
                     emailAddress: [
                         new EmailAddress('mailto:jdoe@test.company'),
                         new EmailAddress('mailto:john.doe@test.company'),
                     ],
                     telephoneNumber: [new TelephoneNumber('1-234-567-8901')],
-                    namespacedAttrinutes: [$attr_cp_1, $attr_cp_2],
+                    namespacedAttribute: [$attr_cp_1, $attr_cp_2],
                 ),
                 new ContactPerson(
                     contactType: 'technical',
@@ -140,6 +140,9 @@ final class RoleDescriptorTest extends TestCase
             strval($roleDescriptor),
         );
     }
+
+
+    // test unmarshalling
 
 
     /**
@@ -184,9 +187,6 @@ final class RoleDescriptorTest extends TestCase
             strval($descriptor),
         );
     }
-
-
-    // test unmarshalling
 
 
     /**

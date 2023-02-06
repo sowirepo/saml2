@@ -32,7 +32,7 @@
     <complexContent>
         <extension base="md:RoleDescriptorType">
             <sequence>
-                <element ref="ssp:Chunk" maxOccurs="unbounded"/>
+                <element ref="saml:Audience" maxOccurs="unbounded"/>
             </sequence>
         </extension>
     </complexContent>
