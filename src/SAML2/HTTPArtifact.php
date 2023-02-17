@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace SAML2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
+use SAML2\Utilities\Temporal;
+use SAML2\XML\saml\Issuer;
 use SimpleSAML\Configuration;
 use SimpleSAML\Metadata\MetaDataStorageHandler;
 use SimpleSAML\Module\saml\Message as MSG;
 use SimpleSAML\Store;
 use SimpleSAML\Utils\HTTP;
-
-use SAML2\Utilities\Temporal;
-use SAML2\XML\saml\Issuer;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Class which implements the HTTP-Artifact binding.
@@ -77,12 +77,12 @@ class HTTPArtifact extends Binding
      * Note: This function never returns.
      *
      * @param \SAML2\Message $message The message we should send.
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function send(Message $message) : void
+    public function send(Message $message): RedirectResponse
     {
         $destination = $this->getRedirectURL($message);
-        Utils::getContainer()->redirect($destination);
+        return Utils::getContainer()->redirect($destination);
     }
 
 

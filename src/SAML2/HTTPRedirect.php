@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SAML2;
 
 use RobRichards\XMLSecLibs\XMLSecurityKey;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Webmozart\Assert\Assert;
 
 /**
@@ -81,13 +82,13 @@ class HTTPRedirect extends Binding
      * Note: This function never returns.
      *
      * @param \SAML2\Message $message The message we should send.
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function send(Message $message) : void
+    public function send(Message $message): RedirectResponse
     {
         $destination = $this->getRedirectURL($message);
         Utils::getContainer()->getLogger()->debug('Redirect to '.strlen($destination).' byte URL: '.$destination);
-        Utils::getContainer()->redirect($destination);
+        return Utils::getContainer()->redirect($destination);
     }
 
 

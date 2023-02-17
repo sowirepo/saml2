@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace SAML2;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
+
 /**
  * Class which implements the HTTP-POST binding.
  *
@@ -17,9 +19,9 @@ class HTTPPost extends Binding
      * Note: This function never returns.
      *
      * @param \SAML2\Message $message The message we should send.
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function send(Message $message) : void
+    public function send(Message $message): RedirectResponse
     {
         if ($this->destination === null) {
             $destination = $message->getDestination();
@@ -51,7 +53,7 @@ class HTTPPost extends Binding
             $post['RelayState'] = $relayState;
         }
 
-        Utils::getContainer()->postRedirect($destination, $post);
+        return Utils::getContainer()->postRedirect($destination, $post);
     }
 
 

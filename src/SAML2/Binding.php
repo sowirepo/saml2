@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SAML2;
 
 use SAML2\Exception\Protocol\UnsupportedBindingException;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Base class for SAML 2 bindings.
@@ -31,7 +32,7 @@ abstract class Binding
      * @throws \SAML2\Exception\Protocol\UnsupportedBindingException
      * @return \SAML2\Binding The binding.
      */
-    public static function getBinding(string $urn) : Binding
+    public static function getBinding(string $urn): Binding
     {
         switch ($urn) {
             case Constants::BINDING_HTTP_POST:
@@ -64,7 +65,7 @@ abstract class Binding
      * @throws \SAML2\Exception\Protocol\UnsupportedBindingException
      * @return \SAML2\Binding The binding.
      */
-    public static function getCurrentBinding() : Binding
+    public static function getCurrentBinding(): Binding
     {
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
@@ -123,7 +124,7 @@ abstract class Binding
      *
      * @return string|null $destination The destination the message will be delivered to.
      */
-    public function getDestination() : ?string
+    public function getDestination(): ?string
     {
         return $this->destination;
     }
@@ -150,9 +151,9 @@ abstract class Binding
      * The message will be delivered to the destination set in the message.
      *
      * @param \SAML2\Message $message The message which should be sent.
-     * @return void
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    abstract public function send(Message $message) : void;
+    abstract public function send(Message $message): Response;
 
 
     /**
